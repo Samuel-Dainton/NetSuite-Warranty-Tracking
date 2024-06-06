@@ -100,6 +100,7 @@ define(['N/record', 'N/log', 'N/search', 'N/format'], function (record, log, sea
                                     type: 'customrecord_warranty_time',
                                     filters: [
                                         ['custrecord_item_type', 'is', warrantyItemType],
+                                        'AND',
                                         ['custrecord_time_pool_location', 'is', toLocationId]
                                     ],
                                     columns: ['internalid', 'custrecord_days_remaining']
@@ -121,12 +122,35 @@ define(['N/record', 'N/log', 'N/search', 'N/format'], function (record, log, sea
                                     log.debug('Expiration Date: ' + expirationDate);
 
                                 } else {
-                                    // Calculate the expiration date for the warranty (current date + 10 years) since it's a new item
-                                    expirationDate = new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate());
+                                    // Check if the item type is one of the specified component types
+                                    if (['Lightning Protection System', 'Solar Charge Controller', 'Power Box', 'Comms Box'].includes(warrantyItemType)) {
+                                        // Check for SCU warranty record if no existing time pool record
+                                        var scuWarrantySearch = search.create({
+                                            type: 'customrecord_wrm_warrantyreg',
+                                            filters: [
+                                                ['custrecord_warranty_item_type', 'is', 'System Control Unit'],
+                                                'AND',
+                                                ['custrecord_custom_location', 'is', toLocationId]
+                                            ],
+                                            columns: ['custrecord_wrm_reg_warrantyexpire']
+                                        });
 
-                                    // Log important steps
-                                    log.debug('Expiration date set to 10 years from today since no existing warranty time record was found for item type: ' + warrantyItemType);
-                                    log.debug('Expiration Date: ' + expirationDate);
+                                        var scuWarrantyResults = scuWarrantySearch.run().getRange({ start: 0, end: 1 });
+
+                                        if (scuWarrantyResults.length > 0) {
+                                            // Use SCU warranty expiration date
+                                            expirationDate = format.parse({ type: format.Type.DATE, value: scuWarrantyResults[0].getValue({ name: 'custrecord_wrm_reg_warrantyexpire' }) });
+                                            log.debug('Expiration date set based on existing SCU warranty record.');
+                                        } else {
+                                            // Calculate the expiration date for the warranty (current date + 10 years) since it's a new item
+                                            expirationDate = new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate());
+                                            log.debug('Expiration date set to 10 years from today since no existing warranty time or SCU warranty record was found for item type: ' + warrantyItemType);
+                                        }
+                                    } else {
+                                        // Calculate the expiration date for the warranty (current date + 10 years) since it's a new item
+                                        expirationDate = new Date(currentDate.getFullYear() + 10, currentDate.getMonth(), currentDate.getDate());
+                                        log.debug('Expiration date set to 10 years from today since no existing warranty time or SCU warranty record was found for item type: ' + warrantyItemType);
+                                    }
                                 }
 
                                 // Set expiration date on the warranty record
