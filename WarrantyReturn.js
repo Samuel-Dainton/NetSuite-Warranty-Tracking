@@ -27,7 +27,7 @@ define(['N/record', 'N/search', 'N/log', 'N/format'], function (record, search, 
         // So if going to 321 or 332 and not coming from 321, 332, 5 or 6,
         // it must be coming back from a hub and therefor the warranty needs to be checked.
         if ((toLocationId == 321 || toLocationId == 332) &&
-            ![321, 332, 5, 6].includes(fromLocationId)) {
+            fromLocationId != 321 && fromLocationId != 332 && fromLocationId != 5 && fromLocationId != 6) {
             log.debug('Condition met, processing script.');
 
             // Retrieve item details from the Item Receipt's line items
