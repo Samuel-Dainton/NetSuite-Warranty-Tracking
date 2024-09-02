@@ -1,22 +1,76 @@
-# NetSuite-Warranty
-A collection of scripts used to generate warranty records and their replacements.
+# NetSuite Warranty Record Management
 
-### Script Deployment Settings
-Applies to: Item Receipt
-Event Type: Create
+This repository contains SuiteScripts developed to extend the functionality of the Warranty Record in NetSuite. These scripts automate the creation, movement, and replacement of warranty records, ensuring that warranties are managed accurately and efficiently based on specific inventory transactions and locations.
 
-## Warranty Creation Script
-The aim of the script is to create a warranty record for all the details of the item, particularly the items serial number, the location it has been sent to and the date that the warranty will expire.
+## Scripts Overview
 
-It first checks the locations on the item receipt and that if it is going from the warehouse (internal id: 321) and not the repair location (332) then it must be going to a hub and therefore needs a warranty record created.
-It then goes through each of the line items. If the item record states that it is indeed an item that needs a warranty, the script continues.
-It then checks if there are any time pool records in existance. A time pool record is created when an item is returned, to represent that an item still under warranty needs replacing and to continue where it left off. The record contains a number of days, the item type and a location.
-If the item receipt matched the item type and location of an existing time record, then it must be a replacement and the days remaining are used to create the replacement warranty.
-If the time remaining is used, the record is deleted.
-If there is no time record, then it must be a new warranty and the item is created with a 10 year warranty.
-The new warranty is saved.
+### 1. Warranty Record Creation and Management (`WarrantyRecordCreation.js`)
 
-## Warranty Return Script
-The return warranty will check an item receipt to make sure the item is going from a hub to the warehouse or the repair location.
-It then creates a time record based on the location and number of days remaining on the warranty.
-After the time record is created, it deletes the associated warranty record of the item.
+**Script Type:** UserEventScript (AfterSubmit)  
+**Purpose:**  
+This script automates the creation and management of warranty records whenever an Item Receipt transaction occurs. The script performs the following functions:
+- Validates if the Item Receipt transaction involves specific locations based on their internal id (e.g., CB Warehouse 321, CB Repairs 332).
+- If the conditions are met, it processes each item in the receipt, checks if the item is warranty-tracked, and then:
+  - Creates a warranty registration record with details such as the item type, serial number, and expiration date.
+  - If an existing warranty time record is found for the item, it is deleted after the new warranty record is successfully created using the remaining time stored for that item type.
+
+**Key Features:**
+- Automatic generation of warranty records based on inventory transactions.
+- Expiration dates are calculated based on existing warranty time records or the item receipt date.
+- Detailed logging of the script’s activities, including conditions met, warranty record creation, and any errors encountered.
+
+### 2. Warranty Record Movement and Replacement (`WarrantyRecordMovement.js`)
+
+**Script Type:** UserEventScript (AfterSubmit)  
+**Purpose:**  
+This script handles the movement and replacement of warranty records during inventory transfers between locations. The script checks if items are being moved to or from specific warehouses or repair centers, and then:
+- Searches for existing warranty registration records matching the item and location.
+- Creates a new warranty time record if the item is warranty-tracked and calculates the remaining warranty period.
+- Deletes the old warranty registration record after processing.
+
+**Key Features:**
+- Ensures warranty records are accurately updated during inventory transfers.
+- Handles different item types and locations dynamically.
+- Provides comprehensive logging for audit and debugging purposes.
+
+### 3. Scheduled Warranty Record Cleanup (`WarrantyRecordCleanup.js`)
+
+**Script Type:** ScheduledScript  
+**Purpose:**  
+This script is designed to periodically clean up expired or obsolete warranty records in the system. It searches for all warranty records and deletes them based on predefined criteria.
+
+**Key Features:**
+- Automates the cleanup of old or invalid warranty records to maintain system efficiency.
+- Reduces the risk of stale data affecting warranty management processes.
+
+## Setup Instructions
+
+1. **Deploy Scripts:**  
+   - Create and deploy script records in NetSuite for each script, linking them to the correct records and triggers if not defined within the script (e.g., after submit for UserEventScripts, scheduled intervals for ScheduledScript).
+
+2. **Customization IDs:**  
+   - Replace placeholder IDs in the script, location IDs and create custom fields if needed (e.g., customrecord_wrm_warrantyreg, custitem_wrm_item_trackwarranty) with your actual custom record and field IDs from your NetSuite account.
+
+3. **Testing:**  
+   - Before deploying in production, test the scripts in a sandbox environment to ensure they function correctly with your existing data and workflows.
+
+4. **Logging:**  
+   - Review the logs generated by the scripts to ensure that the warranty records are being created, moved, or deleted as expected.
+
+## Troubleshooting
+
+- **Common Issues:**
+  - Ensure that all custom records and fields referenced in the scripts exist in your NetSuite environment.
+  - Verify that the locations used in the conditions are correct and match your NetSuite setup.
+  - Check script deployment settings if the script does not trigger as expected.
+
+- **Error Handling:**
+  - The scripts include logging for errors encountered during execution. Review the script logs in NetSuite’s script execution log for details.
+
+## Contributions
+
+Please feel free to submit issues or pull requests if you encounter bugs or have improvements for these scripts. Contributions are welcome!
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
