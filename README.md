@@ -4,7 +4,7 @@ This repository contains SuiteScripts developed to extend the functionality of t
 
 ## Scripts Overview
 
-### 1. Warranty Record Creation and Management (`WarrantyCreation_UE.js`) [WarrantyCreation_UE.js (`WarrantyRecordCreation.js`)](https://github.com/Samuel-Dainton/NetSuite-Warranty/blob/main/WarrantyCreation_UE.js)
+### 1. Warranty Record Creation and Management [WarrantyCreation_UE.js](https://github.com/Samuel-Dainton/NetSuite-Warranty/blob/main/WarrantyCreation_UE.js)
 
 **Script Type:** UserEventScript (AfterSubmit)  
 **Purpose:**  
@@ -19,7 +19,7 @@ This script automates the creation and management of warranty records whenever a
 - Expiration dates are calculated based on existing warranty time records or the item receipt date.
 - Detailed logging of the script’s activities, including conditions met, warranty record creation, and any errors encountered.
 
-### 2. Warranty Record Movement and Replacement (`WarrantyRecordMovement.js`) [Asset Management User Event Script (`AssetManagement_UE.js`)](https://github.com/Samuel-Dainton/NetSuite-Asset-Management/blob/main/AssetManagement_UE.js)
+### 2. Warranty Record Movement and Replacement [WarrantyReturn_UE.js](https://github.com/Samuel-Dainton/NetSuite-Warranty/blob/main/WarrantyReturn_UE.js)
 
 **Script Type:** UserEventScript (AfterSubmit)  
 **Purpose:**  
@@ -33,8 +33,7 @@ This script handles the movement and replacement of warranty records during inve
 - Handles different item types and locations dynamically.
 - Provides comprehensive logging for audit and debugging purposes.
 
-### 3. Scheduled Warranty Record Cleanup (`WarrantyRecordCleanup.js`) [Asset Management User Event Script (`AssetManagement_UE.js`)](https://github.com/Samuel-Dainton/NetSuite-Asset-Management/blob/main/AssetManagement_UE.js)
-
+### 3. Scheduled Warranty Record Cleanup [WarrantyDeletion_SS.js](https://github.com/Samuel-Dainton/NetSuite-Warranty/blob/main/WarrantyDeletion_SS.js)
 **Script Type:** ScheduledScript  
 **Purpose:**  
 This script is designed to periodically clean up expired or obsolete warranty records in the system. It searches for all warranty records and deletes them based on predefined criteria.
